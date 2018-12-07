@@ -22,26 +22,34 @@ void Solve_ALDP_Vib(int&d,int&rr) {
 		IloNum n; // number of tasks
 		IloArray<IloNumArray> V(env); // tasks Vibration
 		IloNum Vl; // Vibration limit
-
+		IloNum nn; // nb de cycle
 		// Read data file
 		ifstream din(to_string(d) + "_" + to_string(rr) + ".dat");
-		din >> T >> k >> n >> r >> Vl;
+		din >> T >> k >> n >> r;
 		din >> t;
 		din >> V;
+
+		//Vl = 2.5*2.5 * 28800;
+		Vl = 2.5*2.5* 28800;
+		nn = floor(28800 / T);
 	///////////// Precedence
-		vector <tuple<int, int>> pT(2 * n);
+		//vector <tuple<int, int>> pT(2 * n);
 		int p, s;
 		char c;
 		din >> p;
 		int compt = 0;
+		vector <tuple<int, int>> pT;
 		while (p != -1 && p != EOF) {
+
 			din >> c;
+
 			din >> s;
-			pT[compt] = make_tuple(p, s);
+			pT.push_back(make_tuple(p, s));
+			//pT[compt] = make_tuple(p, s);
+			//cout << get<0>(pT[compt]) << "," << get<1>(pT[compt]) << endl;
 			din >> p;
-			compt++;
+			//	compt++;
 		}
-		pT.resize(compt);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Create model
@@ -151,10 +159,10 @@ void Solve_ALDP_Vib(int&d,int&rr) {
 			Sum_V.clear();
 			for (int i = 0; i < r; i++) {
 				for (int j = 0; j < n; j++) {
-					Sum_V += (x_ijk[i][j][m] * V[i][j]);
+					Sum_V += (x_ijk[i][j][m] * V[i][j]* t[i][j]);
 				}
 			}
-			mdl.add(Sum_V <= Vl);
+			mdl.add(Sum_V <= Vl/nn);
 		}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +171,7 @@ void Solve_ALDP_Vib(int&d,int&rr) {
 
 	// Solve and output solutions to a file
 	IloCplex cplex(mdl);
-	cplex.setOut(env.getNullStream()); // free the console from compilation's journal
+	//cplex.setOut(env.getNullStream()); // free the console from compilation's journal
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

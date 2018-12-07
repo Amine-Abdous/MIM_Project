@@ -16,14 +16,16 @@
 
 ILOSTLBEGIN
 void Solve_ALDP_Vib(int& d, int& rr);
+void dat(int &d, int&r);
 
 int main() {
 
-	int d = 12;
-	int rr = 2;
+	int d = 117;
+	int rr = 10;
 
+	dat(d, rr);
 	Solve_ALDP_Vib(d,rr);
-
+	
 	system("pause");
 	//system("shutdown/l");
 	return 0;
