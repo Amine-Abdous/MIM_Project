@@ -69,28 +69,36 @@ void dat(int &d, int&r) {
 	for (int j = 0; j < n; j++) {
 		T_ij[0][j] = t[j];
 		F_ij[0][j] = F[j];
-		cout << F_ij[0][j] << "	"<<endl;
+		//cout << F_ij[0][j] << "	"<<endl;
 	}
-
+	
 	int bias = 1;
 	double random;
+	int random4;
+	int random8;
 	double random2;
 	double random3;
 	for (int i = 1; i < r; i++) {
-		random = (rand() % 20);	
-		random2 = random / 100;
+		random = (rand() % 10);	
+		random8 = (rand() % 5);
+		random4 = (rand() % 5);
+		int sign=(-1)^random4;
+		random2 = random / 10;
+
 		//cout << "RANDOM	"<< random << endl;
 		for (int j = 0; j < n; j++) {
-			random3 = (rand() % 10);
-			//cout << "RANDOM3	" << random3 << endl;
-			//if (T_ij[0][j] + bias != 0) { T_ij[i][j] = T_ij[0][j] + bias; }
-			//else if ((T_ij[0][j] + bias) == 0) { T_ij[i][j] = T_ij[0][j]; }
-			T_ij[i][j] = T_ij[0][j] + bias;
-		//	if ((bias-5)==(rand()%10)){ F_ij[i][j] = 200000; }
-			if (random3 == 7) { F_ij[i][j] = 200000;}
-			else if(random3 == 5){ F_ij[0][j] = 200000;}
-			else { F_ij[i][j] = F_ij[0][j] + random2; }
-	
+			random3 = (rand() %20);
+			if (T_ij[0][j] == 0) { T_ij[i][j] = 0; }
+			else if (T_ij[0][j] != 0) {
+			T_ij[i][j] = abs(T_ij[0][j] - random4); 
+			}
+
+			
+			if(random3 == 5){ F_ij[0][j] = 200000;}
+			if(F_ij[0][j]!= 200000) { F_ij[i][j] = abs(F_ij[0][j] - random2); }
+			if (F_ij[0][j] == 200000) { F_ij[i][j] = abs(random8 - random2); }
+			if (random3 == 3) { F_ij[i][j] = 200000;}
+			//F_ij[i][j] = abs(F_ij[0][j] - random2);
 		}
 
 
@@ -100,10 +108,19 @@ for (int j = 0; j < n; j++) {
 	for (int i = 0; i < r; i++) {
 
 			cout  << F_ij[i][j] << "	";
-
+			
 		}
 	cout << endl;
 	}
+cout << "------" << endl;
+for (int j = 0; j < n; j++) {
+	for (int i = 0; i < r; i++) {
+
+		cout << T_ij[i][j] << "	";
+
+	}
+	cout << endl;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////// Write .dat file 
 

@@ -7,10 +7,12 @@
 #include <ctime>
 #include <vector>
 #include <ilopl/iloopl.h>
+#include <math.h>
 
 ILOSTLBEGIN
 
-void Solve_ALDP_Vib(int&d,int&rr) {
+void Solve_ALDP_Vib(int&d,int&rr, int&pp) {
+	ofstream c_out(to_string(d) +"_"+to_string(pp)+"_Solution_Vibration.sol");
 	IloEnv env;
 	try {
 		double Time_Total_d;
@@ -28,10 +30,12 @@ void Solve_ALDP_Vib(int&d,int&rr) {
 		din >> T >> k >> n >> r;
 		din >> t;
 		din >> V;
+		if(pp==0){Vl = 2.5*2.5 * 28800;}
+		if (pp == 1) { Vl = 30*30 * 28800; }
 
-		//Vl = 2.5*2.5 * 28800;
-		Vl = 2.5*2.5* 28800;
 		nn = floor(28800 / T);
+		Vl = Vl/nn;
+		//cout <<"Limit vib:	"<< Vl << endl;
 	///////////// Precedence
 		//vector <tuple<int, int>> pT(2 * n);
 		int p, s;
@@ -162,7 +166,7 @@ void Solve_ALDP_Vib(int&d,int&rr) {
 					Sum_V += (x_ijk[i][j][m] * V[i][j]* t[i][j]);
 				}
 			}
-			mdl.add(Sum_V <= Vl/nn);
+			mdl.add(Sum_V <= Vl);
 		}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,42 +189,105 @@ void Solve_ALDP_Vib(int&d,int&rr) {
 		// total time
 	Time_Total_d = (Fin_total_d - Start_total_d) / (double)CLOCKS_PER_SEC;
 		//////////////////////////////////////////////////////////////////////////
-		vector<bool> X__k(k);
+/*	vector<vector<double>> Vib;
+	vector<double> V1;
+	int min_pos;
+		for (int i = 0; i < V.getSize(); i++) {
+		for (int m = 0; m < V[i].getSize(); m++) {
+			V1.push_back(V[i][m]);
+			c_out << V[i][m] << "	";
+
+		}
+		min_pos = distance(V1.begin(), min_element(V1.begin(), V1.end()));
+		Vib.push_back(V1);
+		c_out << endl;
+	}
+	//int min_pos = distance(Vib.begin(), min_element(Vib.begin(), Vib.end()));
+	cout << "Min Vib	" << Vib[min_pos]<<endl;
+	*/
+	
+	vector<bool> X__k(k);
 			vector<vector<bool>> X__jk(n, X__k);
 			vector<vector<vector<bool>>> X_ijk(r, X__jk);
 			cout << "x" << endl;
+			c_out << "x" << endl;
 			for (int j = 0; j < n; j++) {
 				for (int m = 0; m < k; m++) {
 					for (int i = 0; i < r; i++) {
 						X_ijk[i][j][m] = cplex.getValue(x_ijk[i][j][m]);
 						cout << X_ijk[i][j][m] << "	";
+						c_out << X_ijk[i][j][m] << "	";
 					}
 					cout << endl;
+					c_out << endl;
 				}
 				cout << endl;
+				c_out << endl;
 			}
 		////////////////////////////////////////////////////////////////////////////////////
 			vector<bool> Y__k(k);
 			vector<vector<bool>> Y_ik(r, Y__k);
 			cout << "y" << endl;
+			c_out << "y" << endl;
 	for (IloInt m = 0; m < k; m++) {
 			for (IloInt i = 0; i < r; i++) {
 				
 					Y_ik[i][m] = cplex.getValue(y_ik[i][m]);
 					cout << Y_ik[i][m]  << "	";
+					c_out << Y_ik[i][m] << "	";
 				}
 				cout << endl;
+				c_out << endl;
 			}
 			
 		//////////////////////////////////////////////////////////////////////////
 	cout << endl;
 	cout << d <<"	" <<cplex.getStatus() << "	" << cplex.getObjValue() << endl;
 
+	cout  << "workstation	Tool	vib" << endl;
+
+	c_out << endl;
+	c_out << d << "	" << cplex.getStatus() << "	" << cplex.getObjValue() << endl;
+
+	c_out << "workstation	Tool	vib" << endl;
+	vector<double> Vib_m;
+	vector<int> Tool_m;
+	double sum_Vi = 0;
+	double cte;
+	cte = (1.0/28800.0) *nn;
+	//cout << "cte:	"<< cte<< endl;
+	for (int m=0;m<k;m++){
+		for (int i=0;i<r;i++){
+			if (Y_ik[i][m] == 1) { Tool_m.push_back(i + 1);}
+		}
+	}
+	double sum_f;
+	for (int m = 0; m < k; m++) {
+		sum_Vi = 0;
+		sum_f = 0;
+		for (int i = 0; i < r; i++) {
+			for (int j = 0; j < n; j++) {
+				sum_Vi += X_ijk[i][j][m] * V[i][j] * t[i][j];
+			}
+		}
+		sum_Vi = sum_Vi*cte;
+		sum_f = sqrtl(sum_Vi);
+		//cout << sum_Vi <<"	"<< sum_f << endl;
+		Vib_m.push_back(sum_f);
+	}
+
+
+
+	for (int m = 0; m < k; m++) {
+		cout << m + 1 << "	" << Tool_m[m] << "	" << Vib_m[m] << endl;
+		c_out << m + 1 << "	" << Tool_m[m] << "	" << Vib_m[m] << endl;
+	}
 		}
 		else {
 			//////////////////////////////////////////////////////////////////////////
 			// No solution
 			cout << "No solution for	" << d << endl;
+			c_out << "No solution for	" << d << endl;
 		}
 	}
 
