@@ -186,7 +186,7 @@ void Solve_ALDP_Vib(int&d,int&rr, int&pp) {
 
 	//cplex.setParam(IloCplex::ClockType, 1);
 	clock_t Start_total_d = clock(); // start time
-if (cplex.solve()) {
+	if (cplex.solve()) {
 	clock_t Fin_total_d = clock();
 
 		// total time
@@ -245,11 +245,14 @@ if (cplex.solve()) {
 			
 		//////////////////////////////////////////////////////////////////////////
 	cout << endl;
-	cout << d <<"	" <<cplex.getStatus() << "Total Cost(obj): " << cplex.getObjValue() << endl;
-	
-	c_out << endl;
-	c_out << d << "	" << cplex.getStatus() << "Total Cost(obj): " << cplex.getObjValue() << endl;
+	cout << d <<"	" <<cplex.getStatus() << "	" << cplex.getObjValue() << endl;
 
+	cout  << "workstation	Tool	vib" << endl;
+
+	c_out << endl;
+	c_out << d << "	" << cplex.getStatus() << "	" << cplex.getObjValue() << endl;
+
+	c_out << "workstation	Tool	vib" << endl;
 	vector<double> Vib_m;
 	vector<int> Tool_m;
 	double sum_Vi = 0;
@@ -299,8 +302,8 @@ if (cplex.solve()) {
 	cout << "Tools in each wk: " << endl;
 	c_out << "Tools in each wk: " << endl;
 	for (int m = 0; m < k; m++) {
-		cout << m + 1 << ":	" ;
-		c_out << m + 1 << ":	";
+		cout << m + 1 << "	" ;
+		c_out << m + 1 << "	";
 		for (int i = 0; i < Tool_m.size(); i++) {
 			cout << Tool_m[m] << "	"; c_out << Tool_m[m] << "	";
 		}
@@ -309,11 +312,11 @@ if (cplex.solve()) {
 	}
 	//******************************************************************************************
 	cout << "Time: " << endl;
-			for (int m = 0; m < k; m++) {
-				cout << m + 1 << "	" << time_k[m] <<  endl;
-				c_out << m + 1 << "	" << time_k[m] << endl;
-			}
-}
+	for (int m = 0; m < k; m++) {
+		cout << m + 1 << "	" << time_k[m] <<  endl;
+		c_out << m + 1 << "	" << time_k[m] << endl;
+	}
+		}
 		else {
 			//////////////////////////////////////////////////////////////////////////
 			// No solution
