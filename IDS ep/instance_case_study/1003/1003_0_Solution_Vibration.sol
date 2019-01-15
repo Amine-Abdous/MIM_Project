@@ -637,6 +637,10 @@ vibration in each wk:
 3	2.43703
 4	2.4623
 Tools in each wk: 
+1:	3	3	3	3	
+2:	8	8	8	8	
+3:	8	8	8	8	
+4:	3	3	3	3	
 Time: 
 1	14770
 2	14588

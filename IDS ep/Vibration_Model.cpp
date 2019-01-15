@@ -36,7 +36,9 @@ void Solve_ALDP_Vib(int&d,int&rr, int&pp) {
 		if(pp==0){Vl = 2.5*2.5 * 28800;}
 		if (pp == 1) { Vl = 30*30 * 28800; }
 
-		nn = floor(28800 / T);
+		//nn = floor(28800 / T);
+		nn = floor(28800 / T)+1;
+		cout << "nn=" << nn << endl;
 		Vl = Vl/nn;
 		//cout <<"Limit vib:	"<< Vl << endl;
 	///////////// Precedence
@@ -147,7 +149,6 @@ void Solve_ALDP_Vib(int&d,int&rr, int&pp) {
 			}
 			mdl.add(Sum_g <= Sum_h);
 		}
-
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*	// obj
 		IloExpr Sum_BB(env);
@@ -181,7 +182,7 @@ void Solve_ALDP_Vib(int&d,int&rr, int&pp) {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	cplex.setParam(IloCplex::TiLim, 30); // Time limit
+	//cplex.setParam(IloCplex::TiLim, 300); // Time limit
 	cplex.setParam(IloCplex::Param::ClockType,2); // Time param
 
 	//cplex.setParam(IloCplex::ClockType, 1);
@@ -251,14 +252,14 @@ if (cplex.solve()) {
 	c_out << d << "	" << cplex.getStatus() << "Total Cost(obj): " << cplex.getObjValue() << endl;
 
 	vector<double> Vib_m;
-	vector<int> Tool_m;
+	vector<tuple<int,int>> Tool_m;
 	double sum_Vi = 0;
 	double cte;
 	cte = (1.0/28800.0) *nn;
 	//cout << "cte:	"<< cte<< endl;
 	for (int m=0;m<k;m++){
 		for (int i=0;i<r;i++){
-			if (Y_ik[i][m] == 1) { Tool_m.push_back(i + 1);}
+			if (Y_ik[i][m] == 1) { Tool_m.push_back(make_tuple(m + 1, i + 1)); }
 		}
 	}
 	double sum_f;
@@ -298,17 +299,17 @@ if (cplex.solve()) {
 	//******************************************************************************************
 	cout << "Tools in each wk: " << endl;
 	c_out << "Tools in each wk: " << endl;
-	for (int m = 0; m < k; m++) {
-		cout << m + 1 << ":	" ;
-		c_out << m + 1 << ":	";
-		for (int i = 0; i < Tool_m.size(); i++) {
-			cout << Tool_m[m] << "	"; c_out << Tool_m[m] << "	";
+	for (int m = 0; m < Tool_m.size(); m++) {
+		for (int i = 0; i < k; i++) {
+			if(get<0>(Tool_m[m])== i){
+			cout << i+1 << "," << get<1>(Tool_m[m]) << endl;
+			}
 		}
-		cout << endl;
-		c_out << endl;
+
 	}
 	//******************************************************************************************
 	cout << "Time: " << endl;
+	c_out << "Time: " << endl;
 			for (int m = 0; m < k; m++) {
 				cout << m + 1 << "	" << time_k[m] <<  endl;
 				c_out << m + 1 << "	" << time_k[m] << endl;
